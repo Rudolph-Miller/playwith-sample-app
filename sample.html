@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta content="width=device-width,initial-scale=1.0" name="viewport">
+    <meta charset="UTF-8">
+    <title>PLAYWITH APP SAMPLE</title>
+  </head>
+  <body>
+    <div>
+      <p>PLAYWITH SAMPLE</p>
+      <p>OK Count: <span id='ok-count'>0</span></p>
+
+      <button onclick="sendHello()">Send Hello</button>
+    </div>
+    <script>
+      function sendHello() {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          name: 'hello',
+          message: 'world'
+        }));
+      }
+
+      window.PlaywithReceiveMessage = function({ count }) {
+        document.getElementById('ok-count').innerHTML = String(count);
+      }
+
+      window.PlaywithReceiveMessage();
+    </script>
+  </body>
+</html>
