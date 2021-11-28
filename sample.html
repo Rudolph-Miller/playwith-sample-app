@@ -7,24 +7,70 @@
   </head>
   <body>
     <div>
-      <p>PLAYWITH SAMPLE</p>
-      <p>OK Count: <span id='ok-count'>0</span></p>
+      <h2>PLAYWITH SAMPLE</h2>
+      <p>ID:<span id="id"></span></p>
+      <p>STATUS:</p>
+      <p id="status">not connected</p>
+      <form id='form'>
+        <input id="id-input" value="sample"></input>
+        <button>マッチ</button>
+      </form>
 
-      <button onclick="sendHello()">Send Hello</button>
+      <p>My HP: <span id='my-hp'>10</span></p>
+      <p>Target HP: <span id='target-hp'>10</span></p>
+      <button id='attack'>ATTACK</button>
     </div>
     <script>
-      function sendHello() {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          name: 'hello',
-          message: 'world'
-        }));
-      }
+document.addEventListener('DOMContentLoaded', function() {
+  const pw = window.pw;
 
-      window.PlaywithReceiveMessage = function({ count }) {
-        document.getElementById('ok-count').innerHTML = String(count);
-      }
+  document.getElementById('id').innerHTML = pw.getId();
 
-      window.PlaywithReceiveMessage();
+  const statusElm = document.getElementById('status');
+
+  pw.on('connected', function() {
+    statusElm.innerHTML = 'connected';
+  });
+
+  pw.on('matched', function() {
+    statusElm.innerHTML = 'matched';
+  });
+
+  pw.on('received', function(e) {
+    const { data } = e.detail;
+
+    switch (data.type) {
+      case 'attack': {
+        const myHpElm = document.getElementById('my-hp');
+        const myHp = parseInt(myHpElm.innerHTML);
+
+        myHpElm.innerHTML = String(myHp - 1);
+      };
+    }
+  });
+
+  document.getElementById('form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('id-input').value;
+
+    pw.match(id);
+
+    statusElm.innerHTML = 'matching';
+  });
+
+  document.getElementById('attack').onclick = function() {
+    const targetHpElm = document.getElementById('target-hp');
+    const targetHp = parseInt(targetHpElm.innerHTML);
+
+    targetHpElm.innerHTML = String(targetHp - 1);
+
+    pw.send({
+      type: 'attack',
+      count: 1
+    });
+  };
+}, false);
     </script>
   </body>
 </html>
